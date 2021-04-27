@@ -135,27 +135,34 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
         } else if (requestCode == 2) {
-            Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).reload();
-            handler.postDelayed(() -> {
-                if (Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isEmailVerified()) {
-                    Toast success = Toast.makeText(this, "Welcome back " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), Toast.LENGTH_LONG);
-                    success.setGravity(Gravity.CENTER, 0, 0);
-                    success.show();
-                } else {
-                    Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).sendEmailVerification().addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast toast = Toast.makeText(this, "Please verify your email first", Toast.LENGTH_LONG);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.google.android.gm");
-                            if (launchIntent != null) {
-                                startActivity(launchIntent);
-                                finish();
+            try {
+                Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).reload();
+                handler.postDelayed(() -> {
+                    if (Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).isEmailVerified()) {
+                        Toast success = Toast.makeText(this, "Welcome back " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), Toast.LENGTH_LONG);
+                        success.setGravity(Gravity.CENTER, 0, 0);
+                        success.show();
+                    } else {
+                        Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).sendEmailVerification().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast toast = Toast.makeText(this, "Please verify your email first", Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                toast.show();
+                                Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.google.android.gm");
+                                if (launchIntent != null) {
+                                    startActivity(launchIntent);
+                                    finish();
+                                }
                             }
-                        }
-                    });
-                }
-            }, 3000);
+                        });
+                    }
+                }, 3000);
+            } catch (Exception e) {
+                Toast failed = Toast.makeText(this, "Register/Login Failed !!!", Toast.LENGTH_LONG);
+                failed.setGravity(Gravity.CENTER, 0, 0);
+                failed.show();
+                handler.postDelayed(this::finish, 2000);
+            }
         }
     }
 
